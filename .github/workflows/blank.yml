@@ -1,0 +1,44 @@
+name: Windows RDP
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 10080
+    
+    steps:
+      - name: Instalar e configurar tudo
+        run: |
+          # Instalar AnyDesk
+          Invoke-WebRequest -Uri "https://download.anydesk.com/AnyDesk.exe" -OutFile "AnyDesk.exe"
+          Start-Process -FilePath ".\AnyDesk.exe" -ArgumentList "--silent", "--install", "C:\Program Files (x86)\AnyDesk" -Wait
+          
+          # Iniciar AnyDesk
+          Start-Process "C:\Program Files (x86)\AnyDesk\AnyDesk.exe"
+          
+          # Aguardar inicialização
+          Start-Sleep -Seconds 10
+          
+          # Mostrar ID de conexão
+          Write-Host "========================================="
+          Write-Host "ID DO ANYDESK:"
+          & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --get-id
+          Write-Host "========================================="
+          Write-Host ""
+          Write-Host "SENHA: a senha será exibida abaixo"
+          
+          # Mostrar senha (configura uma senha fixa)
+          & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --set-password "123456"
+          Write-Host "SENHA DEFINIDA: 123456"
+          Write-Host "========================================="
+          
+          # Manter ativo
+          while ($true) {
+            $proc = Get-Process -Name "AnyDesk" -ErrorAction SilentlyContinue
+            if (-not $proc) {
+              Start-Process "C:\Program Files (x86)\AnyDesk\AnyDesk.exe"
+            }
+            Start-Sleep -Seconds 600
+          }
