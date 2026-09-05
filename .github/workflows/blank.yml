@@ -9,39 +9,27 @@ jobs:
     timeout-minutes: 10080
     
     steps:
-      - name: Instalar AnyDesk
+      - name: Baixar e executar AnyDesk
         run: |
-          # Baixar AnyDesk
+          # Baixar AnyDesk (versão portátil)
           Invoke-WebRequest -Uri "https://download.anydesk.com/AnyDesk.exe" -OutFile "AnyDesk.exe"
           
-          # Instalar (COM O CAMINHO CORRETO)
-          .\AnyDesk.exe --silent --install "C:\Program Files (x86)\AnyDesk" --start-with-win
+          # Iniciar AnyDesk diretamente (sem instalar)
+          Start-Process -FilePath ".\AnyDesk.exe" -ArgumentList "--start-with-win"
           
-          # Aguardar instalação
-          Start-Sleep -Seconds 15
-          
-          # Iniciar AnyDesk
-          & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe"
+          # Aguardar iniciar
+          Start-Sleep -Seconds 10
           
           # Mostrar ID
           Write-Host "========================================="
           Write-Host "ID DO ANYDESK:"
-          & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --get-id
+          .\AnyDesk.exe --get-id
           Write-Host "========================================="
-          
-          # Definir senha
-          & "C:\Program Files (x86)\AnyDesk\AnyDesk.exe" --set-password "123456"
           Write-Host "SENHA: 123456"
+          .\AnyDesk.exe --set-password "123456"
           Write-Host "========================================="
           
           # Manter rodando
           while ($true) {
-            Start-Sleep -Seconds 3600
-          }          # Manter ativo
-          while ($true) {
-            $proc = Get-Process -Name "AnyDesk" -ErrorAction SilentlyContinue
-            if (-not $proc) {
-              Start-Process "C:\Program Files (x86)\AnyDesk\AnyDesk.exe"
-            }
             Start-Sleep -Seconds 600
           }
